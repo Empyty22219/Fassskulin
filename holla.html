@@ -1,0 +1,119 @@
+//Tiktok downloader website
+
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Downloader dan Converter Video TikTok</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        p {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Downloader dan Converter Video TikTok</h1>
+    <p>Masukkan tautan video TikTok yang ingin Anda unduh:</p>
+    <input type="text" id="tiktokLink" placeholder="Masukkan tautan video TikTok di sini">
+    <button onclick="downloadVideo()">Unduh Video</button>
+    <p id="message"></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    async function tiktok2(query) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const encodedParams = new URLSearchParams();
+                encodedParams.set('url', query);
+                encodedParams.set('hd', '1');
+const response = await axios({
+        method: 'POST',
+        url: 'https://tikwm.com/api/',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          'Cookie': 'current_language=en',
+          'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36'
+        },
+        data: encodedParams
+      });
+                
+                const videos = response.data.data;
+                const result = {
+                    title: videos.title,
+                    cover: videos.cover,
+                    origin_cover: videos.origin_cover,
+                    no_watermark: videos.play,
+                    watermark: videos.wmplay,
+                    music: videos.music
+                };
+                resolve(result);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    async function downloadVideo() {
+        const link = document.getElementById('tiktokLink').value;
+        const messageElement = document.getElementById('message');
+
+        if (link) {
+            messageElement.textContent = "Mengunduh video...";
+
+            try {
+                const result = await tiktok2(link);
+                messageElement.innerHTML = `Video berhasil diunduh!<br>
+                
+                                            <a href="${result.no_watermark}" target="_blank">Klik di sini untuk mengunduh video tanpa watermark</a>`;
+            } catch (error) {
+                messageElement.textContent = "Terjadi kesalahan: " + error.message;
+            }
+        } else {
+            alert('Silakan masukkan tautan video TikTok.');
+        }
+    }
+</script>
+
+</body>
+</html>
